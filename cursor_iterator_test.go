@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// make sure PgxConnector implements pgxpool.Pool
+// make sure PgxConnector implements pgxpool.Pool.
 var _ cursoriterator.PgxConnector = &pgxpool.Pool{}
 
-// make sure PgxConnector implements pgx.Conn
+// make sure PgxConnector implements pgx.Conn.
 var _ cursoriterator.PgxConnector = &pgx.Conn{}
 
 type User struct {

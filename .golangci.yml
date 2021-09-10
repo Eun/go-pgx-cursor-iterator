@@ -69,9 +69,6 @@ linters-settings:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
     local-prefixes: github.com/Eun/go-pgx-cursor-iterator
-  golint:
-    # minimal confidence for issues, default is 0.8
-    min-confidence: 0.8
   gomnd:
     settings:
       mnd:
@@ -118,6 +115,20 @@ linters-settings:
     require-explanation: true
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
     require-specific: true
+  revive:
+    # see https://github.com/mgechev/revive#available-rules for details.
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: indent-error-flow
+        severity: warning
+      - name: add-constant
+        severity: warning
+        arguments:
+          - maxLitCount: "3"
+            allowStrs: '""'
+            allowInts: "0,1,2"
+            allowFloats: "0.0,0.,1.0,1.,2.0,2."
   unparam:
     # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
     # XXX: if you enable this setting, unparam will report a lot of false-positives in text editors:
@@ -141,6 +152,7 @@ linters:
     - dupl
     - errcheck
     - exhaustive
+    - exportloopref
     - funlen
     - gochecknoinits
     - gocognit
@@ -150,14 +162,12 @@ linters:
     - godot
     - gofmt
     - goimports
-    - golint
     - gomnd
     - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
     - misspell
     - nestif
@@ -165,8 +175,8 @@ linters:
     - noctx
     - nolintlint
     - prealloc
+    - revive
     - rowserrcheck
-    - scopelint
     - staticcheck
     - structcheck
     - stylecheck
@@ -195,6 +205,7 @@ issues:
         - funlen
         - goconst
         - scopelint
+        - revive
 
 
 # golangci.com configuration

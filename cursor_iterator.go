@@ -63,7 +63,12 @@ type PgxConnector interface {
 //	if err := iter.Error(); err != nil {
 //		panic(err)
 //	}
-func NewCursorIterator(connector PgxConnector, values interface{}, maxDatabaseExecutionTime time.Duration, query string, args ...interface{}) (*CursorIterator, error) {
+func NewCursorIterator(
+	connector PgxConnector,
+	values interface{},
+	maxDatabaseExecutionTime time.Duration,
+	query string, args ...interface{},
+) (*CursorIterator, error) {
 	if connector == nil {
 		return nil, errors.New("connector cannot be nil")
 	}
