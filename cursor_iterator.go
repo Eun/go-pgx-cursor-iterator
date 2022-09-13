@@ -44,13 +44,15 @@ type PgxConnector interface {
 
 // NewCursorIterator can be used to create a new iterator.
 // Required parameters:
-//   connector                 most likely a *pgx.Conn or *pgxpool.Pool, needed to start a transaction on the database
-//   values                    a slice where the fetched values should be stored in.
-//   maxDatabaseExecutionTime  how long should one database operation be allowed to run.
-//   query                     the query to fetch the rows
-//   args                      arguments for the query
+//
+//	connector                 most likely a *pgx.Conn or *pgxpool.Pool, needed to start a transaction on the database
+//	values                    a slice where the fetched values should be stored in.
+//	maxDatabaseExecutionTime  how long should one database operation be allowed to run.
+//	query                     the query to fetch the rows
+//	args                      arguments for the query
 //
 // Example Usage:
+//
 //	values := make([]User, 1000)
 //	iter, err := NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users WHERE role = $1", "Guest")
 //	if err != nil {
