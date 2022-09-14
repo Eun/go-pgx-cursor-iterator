@@ -2,10 +2,13 @@ package cursoriterator_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 	"github.com/stretchr/testify/require"
 
 	"github.com/testcontainers/testcontainers-go"
@@ -28,16 +31,37 @@ func NewTestDatabase(t *testing.T) *TestDatabase {
 			"POSTGRES_PASSWORD": "postgres",
 			"POSTGRES_DB":       "postgres",
 		},
-		WaitingFor: wait.ForListeningPort("5432/tcp"),
+		WaitingFor: wait.ForAll(
+			wait.ForListeningPort("5432/tcp"),
+			wait.ForLog("database system is ready to accept connections"),
+		),
 	}
 	postgres, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: req,
 		Started:          true,
 	})
 	require.NoError(t, err)
-	return &TestDatabase{
+	db := &TestDatabase{
 		instance: postgres,
 	}
+
+	for i := 0; i < 10; i++ {
+		conn, err := pgx.Connect(context.Background(), db.ConnectionString(t))
+		if err == nil {
+			_ = conn.Close(context.Background())
+			return db
+		}
+		var pgerr *pgconn.PgError
+		if errors.As(err, &pgerr) {
+			if pgerr.Message == "the database system is starting up" {
+				time.Sleep(time.Millisecond * 500)
+				continue
+			}
+		}
+		require.NoError(t, err)
+	}
+	require.Fail(t, "unable to connect to the database")
+	return nil
 }
 
 func (db *TestDatabase) Port(t *testing.T) int {
