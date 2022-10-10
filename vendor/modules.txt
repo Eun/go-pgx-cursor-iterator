@@ -75,7 +75,7 @@ github.com/docker/go-connections/sockets
 github.com/docker/go-connections/tlsconfig
 # github.com/docker/go-units v0.4.0
 github.com/docker/go-units
-# github.com/georgysavva/scany v1.2.0
+# github.com/georgysavva/scany v1.2.1
 ## explicit
 github.com/georgysavva/scany/dbscan
 github.com/georgysavva/scany/pgxscan
