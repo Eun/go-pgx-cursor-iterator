@@ -1,8 +1,6 @@
 # go-pgx-cursor-iterator
-[![Actions Status](https://github.com/Eun/go-pgx-cursor-iterator/workflows/push/badge.svg)](https://github.com/Eun/go-pgx-cursor-iterator/actions)
+[![Actions Status](https://github.com/Vadim89/go-pgx-cursor-iterator/workflows/push/badge.svg)](https://github.com/Vadim89/go-pgx-cursor-iterator/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Eun/go-pgx-cursor-iterator/badge.svg?branch=master)](https://coveralls.io/github/Eun/go-pgx-cursor-iterator?branch=master)
-[![PkgGoDev](https://img.shields.io/badge/pkg.go.dev-reference-blue)](https://pkg.go.dev/github.com/Eun/go-pgx-cursor-iterator)
-[![go-report](https://goreportcard.com/badge/github.com/Eun/go-pgx-cursor-iterator)](https://goreportcard.com/report/github.com/Eun/go-pgx-cursor-iterator)
 ---
 A golang package for fetching big chunks of rows from a postgres database using a cursor.
 

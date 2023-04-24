@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
-	cursoriterator "github.com/Eun/go-pgx-cursor-iterator"
+	cursoriterator "github.com/Vadim89/go-pgx-cursor-iterator"
 
-	"github.com/jackc/pgx/v4"
-
-	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/stretchr/testify/require"
 )
@@ -30,7 +29,7 @@ func runTest(t *testing.T, usersToInsert []User, fn func(pool *pgxpool.Pool)) {
 	testDB := NewTestDatabase(t)
 	defer testDB.Close(t)
 
-	pool, err := pgxpool.Connect(context.Background(), testDB.ConnectionString(t))
+	pool, err := pgxpool.New(context.Background(), testDB.ConnectionString(t))
 	require.NoError(t, err)
 	defer pool.Close()
 

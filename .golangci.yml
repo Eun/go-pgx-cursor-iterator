@@ -31,7 +31,7 @@ linters-settings:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
     # if not set, use goimports.local-prefixes
-    local-prefixes: github.com/Eun/go-pgx-cursor-iterator
+    local-prefixes: github.com/Vadim89/go-pgx-cursor-iterator
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
     min-complexity: 30
@@ -68,7 +68,7 @@ linters-settings:
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: github.com/Eun/go-pgx-cursor-iterator
+    local-prefixes: github.com/Vadim89/go-pgx-cursor-iterator
   gomnd:
     settings:
       mnd:

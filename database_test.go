@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/require"
-
 	"github.com/testcontainers/testcontainers-go"
+
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
