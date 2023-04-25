@@ -106,6 +106,7 @@ func TestCacheSizes(t *testing.T) {
 	cacheSizes := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 	for _, size := range cacheSizes {
+		size := size
 		t.Run(fmt.Sprint(size), func(t *testing.T) {
 			t.Parallel()
 			runTest(
