@@ -191,6 +191,7 @@ func (iter *CursorIterator) Next() bool {
 		// start a transaction
 		iter.tx, iter.err = iter.connector.Begin(ctx)
 		if iter.err != nil {
+			iter.close()
 			iter.err = errors.Wrap(iter.err, "unable to start transaction")
 			return false
 		}
