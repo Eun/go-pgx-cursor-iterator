@@ -191,13 +191,13 @@ func (iter *CursorIterator) Next() bool {
 		// start a transaction
 		iter.tx, iter.err = iter.connector.Begin(ctx)
 		if iter.err != nil {
-			iter.close()
 			iter.err = errors.Wrap(iter.err, "unable to start transaction")
 			return false
 		}
 
 		// declare cursor
 		if _, err := iter.tx.Exec(ctx, "DECLARE curs CURSOR FOR "+iter.query, iter.args...); err != nil {
+			iter.close()
 			iter.err = errors.Wrap(err, "unable to declare cursor")
 			return false
 		}
