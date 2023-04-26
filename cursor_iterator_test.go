@@ -71,7 +71,7 @@ func TestValueIndex(t *testing.T) {
 		},
 		func(pool *pgxpool.Pool) {
 			values := make([]User, 2)
-			iter, err := cursoriterator.NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users")
+			iter, err := cursoriterator.NewCursorIterator(context.Background(), pool, values, time.Minute, "SELECT * FROM users")
 			require.NoError(t, err)
 			require.Equal(t, -2, iter.ValueIndex())
 			require.True(t, iter.Next())
@@ -118,7 +118,7 @@ func TestCacheSizes(t *testing.T) {
 				},
 				func(pool *pgxpool.Pool) {
 					values := make([]User, size)
-					iter, err := cursoriterator.NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users")
+					iter, err := cursoriterator.NewCursorIterator(context.Background(), pool, values, time.Minute, "SELECT * FROM users")
 					require.NoError(t, err)
 
 					expectValues(t, iter, values,
@@ -141,7 +141,7 @@ func TestEmptyTable(t *testing.T) {
 		[]User{},
 		func(pool *pgxpool.Pool) {
 			values := make([]User, 3)
-			iter, err := cursoriterator.NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users")
+			iter, err := cursoriterator.NewCursorIterator(context.Background(), pool, values, time.Minute, "SELECT * FROM users")
 			require.NoError(t, err)
 
 			expectValues(t, iter, values)
@@ -162,7 +162,7 @@ func TestNextAfterClose(t *testing.T) {
 		},
 		func(pool *pgxpool.Pool) {
 			values := make([]User, 3)
-			iter, err := cursoriterator.NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users")
+			iter, err := cursoriterator.NewCursorIterator(context.Background(), pool, values, time.Minute, "SELECT * FROM users")
 			require.NoError(t, err)
 
 			require.True(t, iter.Next())
@@ -181,28 +181,28 @@ func TestInvalidConstructorParameters(t *testing.T) {
 
 	t.Run("connector cannot be nil", func(t *testing.T) {
 		t.Parallel()
-		iter, err := cursoriterator.NewCursorIterator(nil, make([]User, 3), time.Minute, "SELECT * FROM users")
+		iter, err := cursoriterator.NewCursorIterator(context.Background(), nil, make([]User, 3), time.Minute, "SELECT * FROM users")
 		require.EqualError(t, err, "connector cannot be nil")
 		require.Nil(t, iter)
 	})
 
 	t.Run("values cannot be nil", func(t *testing.T) {
 		t.Parallel()
-		iter, err := cursoriterator.NewCursorIterator(&pgxpool.Pool{}, nil, time.Minute, "SELECT * FROM users")
+		iter, err := cursoriterator.NewCursorIterator(context.Background(), &pgxpool.Pool{}, nil, time.Minute, "SELECT * FROM users")
 		require.EqualError(t, err, "values cannot be nil")
 		require.Nil(t, iter)
 	})
 
 	t.Run("vales must be a slice", func(t *testing.T) {
 		t.Parallel()
-		iter, err := cursoriterator.NewCursorIterator(&pgxpool.Pool{}, User{}, time.Minute, "SELECT * FROM users")
+		iter, err := cursoriterator.NewCursorIterator(context.Background(), &pgxpool.Pool{}, User{}, time.Minute, "SELECT * FROM users")
 		require.EqualError(t, err, "values must be a slice")
 		require.Nil(t, iter)
 	})
 
 	t.Run("values must have a capacity bigger than 0", func(t *testing.T) {
 		t.Parallel()
-		iter, err := cursoriterator.NewCursorIterator(&pgxpool.Pool{}, make([]User, 0), time.Minute, "SELECT * FROM users")
+		iter, err := cursoriterator.NewCursorIterator(context.Background(), &pgxpool.Pool{}, make([]User, 0), time.Minute, "SELECT * FROM users")
 		require.EqualError(t, err, "values must have a capacity bigger than 0")
 		require.Nil(t, iter)
 	})
@@ -221,7 +221,7 @@ func TestTimeout(t *testing.T) {
 		},
 		func(pool *pgxpool.Pool) {
 			values := make([]User, 1)
-			iter, err := cursoriterator.NewCursorIterator(pool, values, time.Second, "SELECT * FROM users")
+			iter, err := cursoriterator.NewCursorIterator(context.Background(), pool, values, time.Second, "SELECT * FROM users")
 			require.NoError(t, err)
 
 			require.True(t, iter.Next())
