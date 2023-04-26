@@ -19,6 +19,7 @@ import (
 // It provides functionality to loop over postgres rows and
 // holds all necessary internal information for the functionality.
 type CursorIterator struct {
+	ctx                      context.Context
 	connector                PgxConnector
 	maxDatabaseExecutionTime time.Duration
 	query                    string
@@ -53,19 +54,21 @@ type PgxConnector interface {
 //
 // Example Usage:
 //
-//	values := make([]User, 1000)
-//	iter, err := NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users WHERE role = $1", "Guest")
-//	if err != nil {
-//		panic(err)
-//	}
-//	defer iter.Close()
-//	for iter.Next() {
-//		fmt.Printf("Name: %s\n", values[iter.ValueIndex()].Name)
-//	}
-//	if err := iter.Error(); err != nil {
-//		panic(err)
-//	}
+//	 ctx := context.Background()
+//		values := make([]User, 1000)
+//		iter, err := NewCursorIterator(ctx, pool, values, time.Minute, "SELECT * FROM users WHERE role = $1", "Guest")
+//		if err != nil {
+//			panic(err)
+//		}
+//		defer iter.Close()
+//		for iter.Next() {
+//			fmt.Printf("Name: %s\n", values[iter.ValueIndex()].Name)
+//		}
+//		if err := iter.Error(); err != nil {
+//			panic(err)
+//		}
 func NewCursorIterator(
+	ctx context.Context,
 	connector PgxConnector,
 	values interface{},
 	maxDatabaseExecutionTime time.Duration,
@@ -106,6 +109,7 @@ func NewCursorIterator(
 	}
 
 	return &CursorIterator{
+		ctx:                      ctx,
 		connector:                connector,
 		maxDatabaseExecutionTime: maxDatabaseExecutionTime,
 		query:                    query,
@@ -124,7 +128,7 @@ func NewCursorIterator(
 }
 
 func (iter *CursorIterator) fetchNextRows() {
-	ctx, cancel := context.WithTimeout(context.Background(), iter.maxDatabaseExecutionTime)
+	ctx, cancel := context.WithTimeout(iter.ctx, iter.maxDatabaseExecutionTime)
 	defer cancel()
 
 	rows, err := iter.tx.Query(ctx, iter.fetchQuery)
@@ -185,7 +189,7 @@ func (iter *CursorIterator) Next() bool {
 		// first call:
 		// start a transaction
 		// and declare the cursor
-		ctx, cancel := context.WithTimeout(context.Background(), iter.maxDatabaseExecutionTime)
+		ctx, cancel := context.WithTimeout(iter.ctx, iter.maxDatabaseExecutionTime)
 		defer cancel()
 
 		// start a transaction
