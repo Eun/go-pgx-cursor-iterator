@@ -4,9 +4,10 @@ go 1.16
 
 require (
 	github.com/georgysavva/scany v1.2.1
-	github.com/jackc/pgconn v1.13.0
-	github.com/jackc/pgx/v4 v4.17.2
+	github.com/jackc/pgconn v1.14.0
+	github.com/jackc/pgx/v4 v4.18.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.2
 	github.com/testcontainers/testcontainers-go v0.12.0
+	golang.org/x/crypto v0.8.0 // indirect
 )
