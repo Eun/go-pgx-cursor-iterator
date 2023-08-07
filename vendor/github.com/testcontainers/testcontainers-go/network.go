@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/network"
 )
 
 // NetworkProvider allows the creation of networks on an arbitrary system
@@ -17,6 +18,16 @@ type Network interface {
 	Remove(context.Context) error // removes the network
 }
 
+type DefaultNetwork string
+
+func (n DefaultNetwork) ApplyGenericTo(opts *GenericProviderOptions) {
+	opts.DefaultNetwork = string(n)
+}
+
+func (n DefaultNetwork) ApplyDockerTo(opts *DockerProviderOptions) {
+	opts.DefaultNetwork = string(n)
+}
+
 // NetworkRequest represents the parameters used to get a network
 type NetworkRequest struct {
 	Driver         string
@@ -26,7 +37,9 @@ type NetworkRequest struct {
 	Name           string
 	Labels         map[string]string
 	Attachable     bool
+	IPAM           *network.IPAM
 
-	SkipReaper  bool   // indicates whether we skip setting up a reaper for this
-	ReaperImage string //alternative reaper registry
+	SkipReaper    bool              // Deprecated: The reaper is globally controlled by the .testcontainers.properties file or the TESTCONTAINERS_RYUK_DISABLED environment variable
+	ReaperImage   string            // Deprecated: use WithImageName ContainerOption instead. Alternative reaper registry
+	ReaperOptions []ContainerOption // Reaper options to use for this network
 }
