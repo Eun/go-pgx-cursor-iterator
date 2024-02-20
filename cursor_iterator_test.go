@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
 
-	cursoriterator "github.com/Eun/go-pgx-cursor-iterator"
+	cursoriterator "github.com/Eun/go-pgx-cursor-iterator/v2"
 )
 
 // make sure PgxConnector implements pgxpool.Pool.
