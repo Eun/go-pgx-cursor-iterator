@@ -1,4 +1,4 @@
-module github.com/Eun/go-pgx-cursor-iterator
+module github.com/Eun/go-pgx-cursor-iterator/v2
 
 go 1.20
 
