@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
-	"time"
 
-	"github.com/georgysavva/scany/pgxscan"
-
-	"github.com/jackc/pgx/v4"
+	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/pkg/errors"
 )
@@ -19,10 +17,9 @@ import (
 // It provides functionality to loop over postgres rows and
 // holds all necessary internal information for the functionality.
 type CursorIterator struct {
-	connector                PgxConnector
-	maxDatabaseExecutionTime time.Duration
-	query                    string
-	args                     []interface{}
+	connector PgxConnector
+	query     string
+	args      []interface{}
 
 	fetchQuery string
 
@@ -68,7 +65,6 @@ type PgxConnector interface {
 func NewCursorIterator(
 	connector PgxConnector,
 	values interface{},
-	maxDatabaseExecutionTime time.Duration,
 	query string, args ...interface{},
 ) (*CursorIterator, error) {
 	if connector == nil {
@@ -106,10 +102,9 @@ func NewCursorIterator(
 	}
 
 	return &CursorIterator{
-		connector:                connector,
-		maxDatabaseExecutionTime: maxDatabaseExecutionTime,
-		query:                    query,
-		args:                     args,
+		connector: connector,
+		query:     query,
+		args:      args,
 
 		fetchQuery: fmt.Sprintf("FETCH %d IN curs", valuesCapacity),
 
@@ -123,14 +118,11 @@ func NewCursorIterator(
 	}, nil
 }
 
-func (iter *CursorIterator) fetchNextRows() {
-	ctx, cancel := context.WithTimeout(context.Background(), iter.maxDatabaseExecutionTime)
-	defer cancel()
-
+func (iter *CursorIterator) fetchNextRows(ctx context.Context) {
 	rows, err := iter.tx.Query(ctx, iter.fetchQuery)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			iter.close()
+			iter.close(ctx)
 			return
 		}
 		iter.err = err
@@ -142,12 +134,12 @@ func (iter *CursorIterator) fetchNextRows() {
 	i := 0
 	for rows.Next() {
 		if i > iter.valuesMaxPos {
-			iter.close()
+			iter.close(ctx)
 			iter.err = errors.New("database returned more rows than expected")
 			return
 		}
 		if err := scanner.Scan(iter.values[i]); err != nil {
-			iter.close()
+			iter.close(ctx)
 			iter.err = errors.Wrap(err, "unable to scan into values element")
 			return
 		}
@@ -156,15 +148,15 @@ func (iter *CursorIterator) fetchNextRows() {
 
 	if err := rows.Err(); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			iter.close()
+			iter.close(ctx)
 			return
 		}
-		iter.close()
+		iter.close(ctx)
 		iter.err = errors.Wrap(err, "unable to fetch rows")
 		return
 	}
 	if i == 0 {
-		iter.close()
+		iter.close(ctx)
 		return
 	}
 	iter.valuesPos = 0
@@ -173,7 +165,7 @@ func (iter *CursorIterator) fetchNextRows() {
 
 // Next will return true if there is a next value available, false if there is no next value available.
 // Next will also fetch next values when all current values have been iterated.
-func (iter *CursorIterator) Next() bool {
+func (iter *CursorIterator) Next(ctx context.Context) bool {
 	iter.mu.Lock()
 	defer iter.mu.Unlock()
 	// it is not the first row, and we already iterated over all rows: early exit
@@ -185,9 +177,6 @@ func (iter *CursorIterator) Next() bool {
 		// first call:
 		// start a transaction
 		// and declare the cursor
-		ctx, cancel := context.WithTimeout(context.Background(), iter.maxDatabaseExecutionTime)
-		defer cancel()
-
 		// start a transaction
 		iter.tx, iter.err = iter.connector.Begin(ctx)
 		if iter.err != nil {
@@ -201,7 +190,7 @@ func (iter *CursorIterator) Next() bool {
 			return false
 		}
 		// fetch the initial rows
-		iter.fetchNextRows()
+		iter.fetchNextRows(ctx)
 		// return true if we have rows
 		return iter.valuesPos == 0
 	}
@@ -213,7 +202,7 @@ func (iter *CursorIterator) Next() bool {
 	}
 
 	// we hit the end: fetch the next chunk of rows
-	iter.fetchNextRows()
+	iter.fetchNextRows(ctx)
 	return iter.valuesPos == 0
 }
 
@@ -234,24 +223,22 @@ func (iter *CursorIterator) Error() error {
 	return err
 }
 
-func (iter *CursorIterator) close() {
+func (iter *CursorIterator) close(ctx context.Context) {
 	if iter.tx == nil {
 		iter.err = nil
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), iter.maxDatabaseExecutionTime)
 	iter.err = iter.tx.Rollback(ctx)
 	iter.tx = nil
-	cancel()
 	iter.valuesPos = -1
 }
 
 // Close will close the iterator and all Next() calls will return false.
 // After Close the iterator is unusable and can not be used again.
-func (iter *CursorIterator) Close() error {
+func (iter *CursorIterator) Close(ctx context.Context) error {
 	iter.mu.Lock()
 	defer iter.mu.Unlock()
-	iter.close()
+	iter.close(ctx)
 	return iter.err
 }

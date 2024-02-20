@@ -7,21 +7,37 @@
 A golang package for fetching big chunks of rows from a postgres database using a cursor.
 
 ```go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	cursoriterator "github.com/Eun/go-pgx-cursor-iterator/v2"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
 type User struct {
 	Name string `db:"name"`
 	Role string `db:"role"`
 }
-values := make([]User, 1000)
-iter, err := NewCursorIterator(pool, values, time.Minute, "SELECT * FROM users WHERE role = $1", "Guest")
-if err != nil {
-	panic(err)
-}
-defer iter.Close()
-for iter.Next() {
-	fmt.Printf("Name: %s\n", values[iter.ValueIndex()].Name)
-}
-if err := iter.Error(); err != nil {
-	panic(err)
+
+func main() {
+	ctx := context.Background()
+	pool, _ := pgxpool.New(ctx, "example-connection-url")
+
+	values := make([]User, 1000)
+	iter, err := cursoriterator.NewCursorIterator(pool, values, "SELECT * FROM users WHERE role = $1", "Guest")
+	if err != nil {
+		panic(err)
+	}
+	defer iter.Close(ctx)
+	for iter.Next(ctx) {
+		fmt.Printf("Name: %s\n", values[iter.ValueIndex()].Name)
+	}
+	if err := iter.Error(); err != nil {
+		panic(err)
+	}
 }
 ```
 
