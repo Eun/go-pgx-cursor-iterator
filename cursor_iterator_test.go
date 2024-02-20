@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	cursoriterator "github.com/Eun/go-pgx-cursor-iterator"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/require"
+
+	cursoriterator "github.com/Eun/go-pgx-cursor-iterator"
 )
 
 // make sure PgxConnector implements pgxpool.Pool.
