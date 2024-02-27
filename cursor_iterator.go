@@ -191,7 +191,8 @@ func (iter *CursorIterator) Next(ctx context.Context) bool {
 		}
 
 		// declare cursor
-		if _, err := iter.tx.Exec(ctx, "DECLARE \""+iter.cursorName+"\" CURSOR FOR "+iter.query, iter.args...); err != nil {
+		query := fmt.Sprintf("DECLARE %q CURSOR FOR %s", iter.cursorName, iter.query)
+		if _, err := iter.tx.Exec(ctx, query, iter.args...); err != nil {
 			iter.err = errors.Wrap(err, "unable to declare cursor")
 			return false
 		}
