@@ -104,8 +104,8 @@ func NewCursorIterator(
 		valuesSlice[i] = elem.Interface()
 	}
 
-	uuid := uuid.New()
-	cursorName := hex.EncodeToString(uuid[:])
+	cursorID := uuid.New()
+	cursorName := hex.EncodeToString(cursorID[:])
 	return &CursorIterator{
 		connector:  connector,
 		query:      query,
