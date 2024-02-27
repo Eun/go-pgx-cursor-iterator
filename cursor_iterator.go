@@ -3,6 +3,7 @@ package cursoriterator
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"reflect"
 	"sync"
@@ -10,6 +11,7 @@ import (
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 
+	uuid "github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -31,7 +33,8 @@ type CursorIterator struct {
 
 	tx pgx.Tx
 
-	mu sync.Mutex
+	mu         sync.Mutex
+	cursorName string
 }
 
 // PgxConnector implements the Begin() function from the pgx and pgxpool packages.
@@ -101,12 +104,15 @@ func NewCursorIterator(
 		valuesSlice[i] = elem.Interface()
 	}
 
+	uuid := uuid.New()
+	cursorName := hex.EncodeToString(uuid[:])
 	return &CursorIterator{
-		connector: connector,
-		query:     query,
-		args:      args,
+		connector:  connector,
+		query:      query,
+		args:       args,
+		cursorName: cursorName,
 
-		fetchQuery: fmt.Sprintf("FETCH %d IN curs", valuesCapacity),
+		fetchQuery: fmt.Sprintf("FETCH %d IN %q", valuesCapacity, cursorName),
 
 		values:       valuesSlice,
 		valuesPos:    -2,
@@ -185,7 +191,7 @@ func (iter *CursorIterator) Next(ctx context.Context) bool {
 		}
 
 		// declare cursor
-		if _, err := iter.tx.Exec(ctx, "DECLARE curs CURSOR FOR "+iter.query, iter.args...); err != nil {
+		if _, err := iter.tx.Exec(ctx, "DECLARE \""+iter.cursorName+"\" CURSOR FOR "+iter.query, iter.args...); err != nil {
 			iter.err = errors.Wrap(err, "unable to declare cursor")
 			return false
 		}
