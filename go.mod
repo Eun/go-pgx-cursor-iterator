@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/docker/go-connections v0.5.0
 	github.com/georgysavva/scany/v2 v2.1.0
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgconn v1.14.1
 	github.com/jackc/pgx/v5 v5.5.3
 	github.com/pkg/errors v0.9.1
@@ -31,7 +32,6 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

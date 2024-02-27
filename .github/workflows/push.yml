@@ -10,7 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Checkout code
         uses: actions/checkout@v4
+      -
+        name: Get go.mod details
+        uses: Eun/go-mod-details@v1.0.6
+        id: go-mod-details
+      -
+        name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ steps.go-mod-details.outputs.go_version }}
       -
         name: lint
         uses: golangci/golangci-lint-action@v4.0.0
@@ -25,9 +35,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Checkout code
         uses: actions/checkout@v4
       -
+        name: Get go.mod details
+        uses: Eun/go-mod-details@v1.0.6
+        id: go-mod-details
+      -
+        name: Install Go
         uses: actions/setup-go@v5
+        with:
+          go-version: ${{ steps.go-mod-details.outputs.go_version }}
       # we cannot use nancy-github-action because it is outdated, so it's better to use the latest
       # docker image for the validation
       -
