@@ -11,7 +11,7 @@ import (
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 
-	uuid "github.com/google/uuid"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
