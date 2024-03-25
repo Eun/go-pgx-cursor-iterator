@@ -79,7 +79,7 @@ github.com/docker/go-units
 # github.com/felixge/httpsnoop v1.0.3
 ## explicit; go 1.13
 github.com/felixge/httpsnoop
-# github.com/georgysavva/scany/v2 v2.1.0
+# github.com/georgysavva/scany/v2 v2.1.1
 ## explicit; go 1.18
 github.com/georgysavva/scany/v2/dbscan
 github.com/georgysavva/scany/v2/pgxscan
