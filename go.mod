@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/docker/go-connections v0.5.0
-	github.com/georgysavva/scany/v2 v2.1.0
+	github.com/georgysavva/scany/v2 v2.1.3
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgconn v1.14.1
 	github.com/jackc/pgx/v5 v5.5.5
