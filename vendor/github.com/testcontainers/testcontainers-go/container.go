@@ -99,9 +99,23 @@ type FromDockerfile struct {
 }
 
 type ContainerFile struct {
-	HostFilePath      string
+	HostFilePath      string    // If Reader is present, HostFilePath is ignored
+	Reader            io.Reader // If Reader is present, HostFilePath is ignored
 	ContainerFilePath string
 	FileMode          int64
+}
+
+// validate validates the ContainerFile
+func (c *ContainerFile) validate() error {
+	if c.HostFilePath == "" && c.Reader == nil {
+		return errors.New("either HostFilePath or Reader must be specified")
+	}
+
+	if c.ContainerFilePath == "" {
+		return errors.New("ContainerFilePath must be specified")
+	}
+
+	return nil
 }
 
 // ContainerRequest represents the parameters used to get a running container
@@ -194,6 +208,8 @@ func (c *ContainerRequest) Validate() error {
 
 // GetContext retrieve the build context for the request
 func (c *ContainerRequest) GetContext() (io.Reader, error) {
+	var includes []string = []string{"."}
+
 	if c.ContextArchive != nil {
 		return c.ContextArchive, nil
 	}
@@ -209,7 +225,14 @@ func (c *ContainerRequest) GetContext() (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	buildContext, err := archive.TarWithOptions(c.Context, &archive.TarOptions{ExcludePatterns: excluded})
+
+	dockerIgnoreLocation := filepath.Join(abs, ".dockerignore")
+	includes = append(includes, dockerIgnoreLocation, c.GetDockerfile())
+
+	buildContext, err := archive.TarWithOptions(
+		c.Context,
+		&archive.TarOptions{ExcludePatterns: excluded, IncludeFiles: includes},
+	)
 	if err != nil {
 		return nil, err
 	}
