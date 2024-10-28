@@ -7,7 +7,7 @@ require (
 	github.com/georgysavva/scany/v2 v2.1.3
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgconn v1.14.1
-	github.com/jackc/pgx/v5 v5.5.5
+	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.32.0
