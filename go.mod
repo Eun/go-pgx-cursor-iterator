@@ -1,10 +1,11 @@
 module github.com/Eun/go-pgx-cursor-iterator/v2
 
 go 1.20
+toolchain go1.24.1
 
 require (
 	github.com/docker/go-connections v0.5.0
-	github.com/georgysavva/scany/v2 v2.1.3
+	github.com/georgysavva/scany/v2 v2.1.4
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgconn v1.14.3
 	github.com/jackc/pgx/v5 v5.6.0
