@@ -11,7 +11,7 @@ jobs:
     steps:
       -
         name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       -
         name: Get go.mod details
         uses: Eun/go-mod-details@v1.0.7
@@ -36,7 +36,7 @@ jobs:
     steps:
       -
         name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       -
         name: Get go.mod details
         uses: Eun/go-mod-details@v1.0.7
@@ -61,7 +61,7 @@ jobs:
     steps:
       -
         name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       -
         name: Get go.mod details
         uses: Eun/go-mod-details@v1.0.7
